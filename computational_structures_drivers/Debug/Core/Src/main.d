@@ -27,7 +27,9 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_pwr_ex.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart_ex.h \
- ../Core/Inc/ring_buffer.h ../Core/Inc/keyboard.h ../Core/Inc/main.h
+ ../Core/Inc/ring_buffer.h ../External/SSD1306/ssd1306.h \
+ ../External/SSD1306/ssd1306_conf.h ../External/SSD1306/ssd1306_fonts.h \
+ ../External/SSD1306/ssd1306_fonts.h
 ../Core/Inc/main.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h:
 ../Core/Inc/stm32l4xx_hal_conf.h:
@@ -58,5 +60,7 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart_ex.h:
 ../Core/Inc/ring_buffer.h:
-../Core/Inc/keyboard.h:
-../Core/Inc/main.h:
+../External/SSD1306/ssd1306.h:
+../External/SSD1306/ssd1306_conf.h:
+../External/SSD1306/ssd1306_fonts.h:
+../External/SSD1306/ssd1306_fonts.h:
