@@ -22,6 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "ring_buffer.h"
+#include "keyboard.h"
 #include "stdio.h"
 /* USER CODE END Includes */
 
@@ -41,9 +42,12 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+I2C_HandleTypeDef hi2c1;
+
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
+uint16_t key_event = 0xFF;
 uint8_t rx_buffer[16];
 ring_buffer_t ring_buffer_uart_rx;
 uint8_t rx_data;
@@ -53,6 +57,7 @@ uint8_t rx_data;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
+static void MX_I2C1_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -71,11 +76,7 @@ int _write(int file, char *ptr, int len)
 }
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-	uint16_t column_1=(COLUMN_1_GPIO_Port->IDR & COLUMN_1_Pin);
-	uint16_t column_2=(COLUMN_2_GPIO_Port->IDR & COLUMN_2_Pin);
-	uint16_t column_3=(COLUMN_3_GPIO_Port->IDR & COLUMN_3_Pin);
-	uint16_t column_4=(COLUMN_4_GPIO_Port->IDR & COLUMN_4_Pin);
-	printf("Keys: %x,%x,%x,%x\r\n", column_1, column_2, column_3, column_4);
+	key_event=GPIO_Pin;
 }
 
 /* USER CODE END 0 */
@@ -109,20 +110,20 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART2_UART_Init();
+  MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
   ring_buffer_init(&ring_buffer_uart_rx, rx_buffer, 16);
+  keypad_init();  // Initialize the keypad functionality
   HAL_UART_Receive_IT(&huart2, &rx_data, 1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  ROW_1_GPIO_Port->BSRR= ROW_1_Pin;
-  ROW_2_GPIO_Port->BSRR= ROW_2_Pin;
-  ROW_3_GPIO_Port->BSRR= ROW_3_Pin;
-  ROW_4_GPIO_Port->BSRR= ROW_4_Pin;
+
 
   while (1)
   {
+	  /*
 	 uint16_t size = ring_buffer_size(&ring_buffer_uart_rx);
 
 	 if(size != 0){
@@ -134,7 +135,14 @@ int main(void)
 		 printf("Rec: %s\r\n", rx_data);
 
 	 }
-	 HAL_Delay(100);
+	 keypad_handler();*/
+	 if (key_event != 0xFF) { // check if there is a event from the EXTi callback
+	  		  uint16_t key_pressed = keypad_handler(key_event); // call the keypad handler
+	  		  if (key_pressed != 0xFF) {
+	  			  printf("Key pressed: %x\r\n", key_pressed); // print the key pressed
+	  		  }
+	  		  key_event = 0xFF; // clean the event
+	 }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -189,6 +197,54 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+}
+
+/**
+  * @brief I2C1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_I2C1_Init(void)
+{
+
+  /* USER CODE BEGIN I2C1_Init 0 */
+
+  /* USER CODE END I2C1_Init 0 */
+
+  /* USER CODE BEGIN I2C1_Init 1 */
+
+  /* USER CODE END I2C1_Init 1 */
+  hi2c1.Instance = I2C1;
+  hi2c1.Init.Timing = 0x10909CEC;
+  hi2c1.Init.OwnAddress1 = 0;
+  hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+  hi2c1.Init.OwnAddress2 = 0;
+  hi2c1.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
+  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+  hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+  if (HAL_I2C_Init(&hi2c1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Analogue filter
+  */
+  if (HAL_I2CEx_ConfigAnalogFilter(&hi2c1, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Digital filter
+  */
+  if (HAL_I2CEx_ConfigDigitalFilter(&hi2c1, 0) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN I2C1_Init 2 */
+
+  /* USER CODE END I2C1_Init 2 */
+
 }
 
 /**
