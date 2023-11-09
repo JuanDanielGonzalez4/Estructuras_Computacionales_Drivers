@@ -1,0 +1,6 @@
+computational_structures_drivers/Debug/
+computational_structures_drivers/Debug/Core/Src/subdir.mk
+computational_structures_drivers/Debug/Core/Startup/subdir.mk
+computational_structures_drivers/Debug/Drivers/STM32L4xx_HAL_Driver/Src/subdir.mk
+computational_structures_drivers/Debug/makefile
+computational_structures_drivers/Debug/sources.mk
